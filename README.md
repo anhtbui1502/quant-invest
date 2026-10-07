@@ -31,7 +31,17 @@ tests/              test backend (dùng dữ liệu mẫu, không cần mạng)
 scripts/            check_sources.py: kiểm tra kết nối tới nguồn dữ liệu thật
 ```
 
-## Cài đặt (lần đầu)
+## Chạy nhanh bằng một lệnh (macOS / Linux / GitHub Codespaces)
+
+```bash
+./run.sh            # cài đặt, kiểm tra nguồn dữ liệu, chạy web tại http://localhost:8000
+./run.sh --demo     # chạy với dữ liệu giả lập
+./run.sh --check    # chỉ kiểm tra kết nối tới nguồn dữ liệu thật
+```
+
+Trên Codespaces: khi web chạy, bấm **Open in Browser** ở thông báo góc phải dưới, hoặc mở tab **PORTS**.
+
+## Cài đặt thủ công (lần đầu)
 
 Cần cài sẵn **Python 3.11+** và **Node.js 20+**.
 
