@@ -1,0 +1,28 @@
+@import "tailwindcss";
+
+/* Bảng màu nền tối kiểu sàn giao dịch (theo quy ước biến của shadcn/ui). */
+@theme {
+  --color-background: #0b0f17;
+  --color-foreground: #e5e7eb;
+  --color-card: #0f1520;
+  --color-muted: #121826;
+  --color-muted-foreground: #7d8799;
+  --color-border: #1f2633;
+  --color-input: #263042;
+  --color-accent: #1a2333;
+  --color-primary: #3b82f6;
+  --color-up: #22c55e;
+  --color-down: #f43f5e;
+  --color-flat: #eab308;
+  --font-sans: "Be Vietnam Pro", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+}
+
+html, body, #root { height: 100%; }
+body {
+  background: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+.tabular { font-variant-numeric: tabular-nums; }

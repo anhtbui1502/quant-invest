@@ -1,0 +1,7 @@
+{"data":[
+ {"code":"FPT","date":"2026-10-06","floor":"HOSE","basicPrice":126.1,"ceilingPrice":134.9,"floorPrice":117.3,"open":126.5,"high":129.0,"low":126.0,"close":128.4,"change":2.3,"pctChange":1.84,"nmVolume":4820000},
+ {"code":"FPT","date":"2026-10-03","floor":"HOSE","basicPrice":125.0,"ceilingPrice":133.7,"floorPrice":116.3,"open":125.2,"high":126.8,"low":124.9,"close":126.1,"change":1.1,"pctChange":0.88,"nmVolume":3900000},
+ {"code":"VNM","date":"2026-10-06","floor":"HOSE","basicPrice":61.6,"ceilingPrice":65.9,"floorPrice":57.3,"open":61.6,"high":61.8,"low":61.0,"close":61.2,"change":-0.4,"pctChange":-0.65,"nmVolume":2100000},
+ {"code":"VNM","date":"2026-10-03","floor":"HOSE","basicPrice":61.0,"ceilingPrice":65.2,"floorPrice":56.8,"open":61.0,"high":61.7,"low":60.9,"close":61.6,"change":0.6,"pctChange":0.98,"nmVolume":1800000},
+ {"code":"SHS","date":"2026-10-06","floor":"HNX","basicPrice":13.2,"ceilingPrice":14.5,"floorPrice":11.9,"open":13.2,"high":13.5,"low":13.1,"close":13.4,"change":0.2,"pctChange":1.52,"nmVolume":9000000}
+]}

@@ -1,0 +1,6 @@
+[
+ {"symbol":"BTCUSDT","priceChange":"771.12","priceChangePercent":"1.25","weightedAvgPrice":"62100.5","openPrice":"61679.00","highPrice":"62800.00","lowPrice":"61200.00","lastPrice":"62450.12","volume":"18500.2","quoteVolume":"1148863000.5","count":2154321},
+ {"symbol":"ETHUSDT","priceChange":"-20.5","priceChangePercent":"-0.82","weightedAvgPrice":"2490.1","openPrice":"2501.00","highPrice":"2530.00","lowPrice":"2460.00","lastPrice":"2480.50","volume":"250000","quoteVolume":"622525000","count":1200000},
+ {"symbol":"SOLUSDT","priceChange":"3.2","priceChangePercent":"2.21","weightedAvgPrice":"147","openPrice":"145.00","highPrice":"149.90","lowPrice":"144.10","lastPrice":"148.20","volume":"2100000","quoteVolume":"308700000","count":800000},
+ {"symbol":"ETHBTC","priceChange":"0","priceChangePercent":"0","weightedAvgPrice":"0.04","openPrice":"0.04","highPrice":"0.04","lowPrice":"0.04","lastPrice":"0.0397","volume":"1","quoteVolume":"999999999999","count":1}
+]

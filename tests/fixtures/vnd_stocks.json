@@ -1,0 +1,7 @@
+{"data":[
+ {"code":"FPT","type":"STOCK","floor":"HOSE","status":"LISTED","companyName":"Công ty Cổ phần FPT","companyNameEng":"FPT Corporation","shortName":"FPT Corp","listedDate":"2006-12-13"},
+ {"code":"VNM","type":"STOCK","floor":"HOSE","status":"LISTED","companyName":"Công ty Cổ phần Sữa Việt Nam","companyNameEng":"Vietnam Dairy Products JSC","shortName":"Vinamilk","listedDate":"2006-01-19"},
+ {"code":"SHS","type":"STOCK","floor":"HNX","status":"LISTED","companyName":"Công ty Cổ phần Chứng khoán Sài Gòn - Hà Nội","companyNameEng":"Saigon - Hanoi Securities JSC","shortName":"SHS","listedDate":"2009-07-23"},
+ {"code":"BSR","type":"STOCK","floor":"UPCOM","status":"LISTED","companyName":"Công ty Cổ phần Lọc hóa dầu Bình Sơn","companyNameEng":"Binh Son Refining and Petrochemical JSC","shortName":"BSR","listedDate":"2018-03-01"},
+ {"code":"OTC1","type":"STOCK","floor":"OTC","status":"LISTED","companyName":"Mã ngoài sàn","companyNameEng":"","shortName":"","listedDate":""}
+],"currentPage":1,"size":5000,"totalElements":5,"totalPages":1}
