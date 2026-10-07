@@ -15,6 +15,7 @@ import { cryptoDecimals, formatPrice } from "@/lib/format";
 
 const UP = "#22c55e";
 const DOWN = "#f43f5e";
+const VISIBLE_BARS = 150;
 
 /** Lightweight Charts hiển thị giờ theo UTC, nên dịch thời gian sang múi giờ cần hiển thị:
  *  cổ phiếu VN luôn theo giờ Việt Nam (UTC+7), crypto theo giờ máy người dùng. */
@@ -104,8 +105,11 @@ export function CandleChart({
 
     // Chỉ căn lại khung nhìn khi đổi mã hoặc khung thời gian, không phải mỗi lần tự làm mới.
     const key = `${category}:${intraday}:${candles[0]?.time}`;
+    // Ban đầu chỉ hiện ~150 nến gần nhất để nến đủ rộng, dễ nhìn; kéo sang trái để xem lịch sử.
     if (key !== lastKey.current) {
-      chart.current.timeScale().fitContent();
+      const ts = chart.current.timeScale();
+      if (candles.length > VISIBLE_BARS) ts.setVisibleLogicalRange({ from: candles.length - VISIBLE_BARS, to: candles.length + 3 });
+      else ts.fitContent();
       lastKey.current = key;
     }
   }, [candles, category, intraday]);

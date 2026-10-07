@@ -13,6 +13,8 @@ const FALLBACK_TF: Record<CategoryId, string[]> = {
   crypto: ["1m", "5m", "15m", "1h", "4h", "1d", "1w"],
 };
 
+const DEFAULT_SYMBOL: Record<CategoryId, string> = { vn: "FPT", crypto: "BTCUSDT" };
+
 export default function App() {
   const [view, update] = useViewState();
   const [searchOpen, setSearchOpen] = useState(false);
@@ -25,11 +27,14 @@ export default function App() {
   const timeframes = categories.find((c) => c.id === view.category)?.timeframes ?? FALLBACK_TF[view.category];
   const timeframe = timeframes.includes(view.timeframe) ? view.timeframe : "1d";
 
-  // Chưa chọn mã nào: tự chọn mã đầu danh sách (giao dịch nhiều nhất).
+  // Chưa chọn mã nào: tự chọn mã đầu danh sách (giao dịch nhiều nhất),
+  // hoặc mã mặc định nếu không tải được danh sách.
   const list = useQuery({ queryKey: ["assets", view.category], queryFn: () => api.assets(view.category) });
   useEffect(() => {
-    if (!view.symbol && list.data?.length) update({ symbol: list.data[0].symbol });
-  }, [view.symbol, list.data, update]);
+    if (view.symbol) return;
+    if (list.data?.length) update({ symbol: list.data[0].symbol });
+    else if (list.isError) update({ symbol: DEFAULT_SYMBOL[view.category] });
+  }, [view.symbol, view.category, list.data, list.isError, update]);
 
   // Phím tắt Ctrl+K / ⌘K hoặc "/" để mở ô tìm kiếm.
   useEffect(() => {

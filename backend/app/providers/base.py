@@ -42,7 +42,8 @@ class TTLCache:
 def make_client(transport: httpx.AsyncBaseTransport | None = None) -> httpx.AsyncClient:
     return httpx.AsyncClient(
         timeout=config.HTTP_TIMEOUT,
-        headers={"User-Agent": USER_AGENT, "Accept": "application/json"},
+        # dchart VNDirect trả lỗi 406 nếu Accept chỉ có application/json.
+        headers={"User-Agent": USER_AGENT, "Accept": "application/json, text/plain, */*"},
         follow_redirects=True,
         transport=transport,
     )

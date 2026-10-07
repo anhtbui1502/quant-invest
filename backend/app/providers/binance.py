@@ -13,6 +13,8 @@ from ..models import AssetInfo, AssetSummary, Candle, InfoField
 from .base import NotFound, Provider, ProviderError
 
 QUOTE = "USDT"
+# Stablecoin neo giá USD/EUR: giá gần như đứng yên nên không đưa vào danh sách.
+STABLECOINS = {"USDC", "FDUSD", "TUSD", "USDP", "DAI", "BUSD", "USDE", "PYUSD", "USD1", "EUR", "EURI", "AEUR", "XUSD", "BFUSD", "RLUSD", "USDS"}
 TIMEFRAMES = ["1m", "5m", "15m", "1h", "4h", "1d", "1w"]
 
 
@@ -43,7 +45,9 @@ class BinanceProvider(Provider):
         return {
             s["symbol"]: s
             for s in data.get("symbols", [])
-            if s.get("status") == "TRADING" and s.get("quoteAsset") == QUOTE
+            if s.get("status") == "TRADING"
+            and s.get("quoteAsset") == QUOTE
+            and s.get("baseAsset") not in STABLECOINS
         }
 
     async def list_assets(self) -> list[AssetSummary]:

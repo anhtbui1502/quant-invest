@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import statistics
 import time
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta, timezone
 from typing import Any
 
 import httpx
@@ -63,6 +63,7 @@ class VNDirectProvider(Provider):
         super().__init__(client)
         self.finfo = finfo_url or config.VNDIRECT_FINFO_URL
         self.chart_url = chart_url or config.VNDIRECT_CHART_URL
+        self.chart_base = self.chart_url.rsplit("/", 1)[0]  # .../dchart
 
     # ---------- danh sách mã ----------
     async def _stocks(self) -> dict[str, dict]:
@@ -159,9 +160,75 @@ class VNDirectProvider(Provider):
         ]
         return clean_candles(candles)[-limit:]
 
+    # ---------- tìm kiếm ----------
+    async def search(self, query: str, limit: int = 20) -> list[AssetSummary]:
+        try:
+            return await super().search(query, limit)
+        except NotFound:
+            raise
+        except ProviderError:
+            # finfo không truy cập được: dùng API tìm kiếm của dchart (không kèm giá).
+            rows = await self.get_json(
+                f"{self.chart_base}/search",
+                {"query": query.strip(), "limit": limit, "type": "stock", "exchange": ""},
+                ttl=300,
+            )
+            return [
+                AssetSummary(
+                    category=self.category,
+                    symbol=r["symbol"],
+                    display=r["symbol"],
+                    name=r.get("description") or r["symbol"],
+                    exchange=str(r.get("exchange", "")).upper(),
+                )
+                for r in rows
+                if r.get("symbol") and str(r.get("exchange", "")).upper() in FLOORS
+            ]
+
     # ---------- thông tin cơ bản ----------
     async def info(self, symbol: str) -> AssetInfo:
-        code = symbol.upper()
+        try:
+            return await self._info_finfo(symbol.upper())
+        except NotFound:
+            raise
+        except ProviderError:
+            # finfo không truy cập được (VD bị chặn IP nước ngoài): tính từ dữ liệu nến dchart.
+            return await self._info_chart(symbol.upper())
+
+    async def _info_chart(self, code: str) -> AssetInfo:
+        meta = await self.get_json(f"{self.chart_base}/symbols", {"symbol": code}, ttl=12 * 3600)
+        if not isinstance(meta, dict) or not meta.get("name"):
+            raise NotFound(f"Không tìm thấy mã cổ phiếu {code}")
+        exchange = str(meta.get("exchange-listed") or meta.get("exchange-traded") or "").upper()
+        year = await self.candles(code, "1d", limit=260)
+        last = year[-1] if year else None
+        prev = year[-2] if len(year) > 1 else None
+        change = last.close - prev.close if last and prev else None
+        fields = [
+            InfoField("Đóng cửa phiên trước", prev.close if prev else None, "price"),
+            InfoField("Mở cửa", last.open if last else None, "price"),
+            InfoField("Cao nhất", last.high if last else None, "price"),
+            InfoField("Thấp nhất", last.low if last else None, "price"),
+            InfoField("Khối lượng", last.volume if last else None, "volume"),
+            InfoField("Đỉnh 52 tuần", max((c.high for c in year), default=None), "price"),
+            InfoField("Đáy 52 tuần", min((c.low for c in year), default=None), "price"),
+            InfoField("Sàn niêm yết", exchange, "text"),
+            InfoField("Phiên gần nhất", _vn_date(last.time) if last else None, "date"),
+        ]
+        return AssetInfo(
+            category=self.category,
+            symbol=code,
+            display=code,
+            name=meta.get("description") or code,
+            exchange=exchange,
+            currency="VND",
+            price=last.close if last else None,
+            change=change,
+            change_pct=change / prev.close * 100 if change is not None and prev.close else None,
+            fields=[f for f in fields if f.value not in (None, "")],
+        )
+
+    async def _info_finfo(self, code: str) -> AssetInfo:
         s = (await self._stocks()).get(code)
         if not s:
             raise NotFound(f"Không tìm thấy mã cổ phiếu {code}")
@@ -207,6 +274,11 @@ class VNDirectProvider(Provider):
             change_pct=_f(p.get("pctChange")),
             fields=[f for f in fields if f.value not in (None, "")],
         )
+
+
+def _vn_date(ts: int) -> str:
+    """Ngày theo giờ Việt Nam (UTC+7) của một mốc thời gian unix."""
+    return datetime.fromtimestamp(ts, timezone(timedelta(hours=7))).date().isoformat()
 
 
 def _f(v: Any) -> float | None:

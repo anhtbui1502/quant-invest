@@ -54,7 +54,7 @@ def binance(base_urls=None):
 def test_binance_lists_only_trading_usdt_pairs_sorted_by_value():
     items = run(binance().list_assets())
     symbols = [a.symbol for a in items]
-    assert symbols == ["BTCUSDT", "ETHUSDT", "SOLUSDT"]  # ETHBTC (quote BTC) & LUNAUSDT (BREAK) bị loại
+    assert symbols == ["BTCUSDT", "ETHUSDT", "SOLUSDT"]  # loại ETHBTC (quote BTC), LUNAUSDT (BREAK), USDCUSDT (stablecoin)
     btc = items[0]
     assert btc.display == "BTC/USDT"
     assert btc.price == 62450.12
@@ -158,3 +158,41 @@ def test_detect_scale():
 
 def test_fold():
     assert fold("Hòa Phát Đầu Tư") == "hoa phat dau tu"
+
+
+# ---------- VNDirect khi finfo không truy cập được ----------
+def vnd_no_finfo_handler(request: httpx.Request) -> httpx.Response:
+    if request.url.host.startswith("finfo"):
+        return httpx.Response(502, text="Bad Gateway")
+    path = request.url.path
+    if path.endswith("/symbols"):
+        if request.url.params["symbol"] != "FPT":
+            return httpx.Response(200, json={"s": "error", "errmsg": "unknown_symbol"})
+        return httpx.Response(200, json={"name": "FPT", "exchange-listed": "HOSE", "description": "CTCP FPT"})
+    if path.endswith("/search"):
+        return httpx.Response(200, json=[
+            {"symbol": "FPT", "description": "CTCP FPT", "exchange": "HOSE", "type": "CỔ PHIẾU"},
+            {"symbol": "FPTS", "description": "CK FPT", "exchange": "HNX", "type": "CỔ PHIẾU"},
+        ])
+    return vnd_handler(request)
+
+
+def vnd_no_finfo():
+    return VNDirectProvider(make_client(httpx.MockTransport(vnd_no_finfo_handler)),
+                            finfo_url="https://finfo-api.vndirect.com.vn/v4",
+                            chart_url="https://dchart-api.vndirect.com.vn/dchart/history")
+
+
+def test_vn_info_falls_back_to_chart():
+    info = run(vnd_no_finfo().info("fpt"))
+    fields = {f.label: f.value for f in info.fields}
+    assert info.name == "CTCP FPT" and info.exchange == "HOSE"
+    assert info.price == 128400 and fields["Đóng cửa phiên trước"] == 126100
+    assert round(info.change_pct, 2) == 1.82
+    with pytest.raises(NotFound):
+        run(vnd_no_finfo().info("ZZZ"))
+
+
+def test_vn_search_falls_back_to_chart():
+    res = run(vnd_no_finfo().search("FPT"))
+    assert [a.symbol for a in res] == ["FPT", "FPTS"]
